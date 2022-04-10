@@ -48,8 +48,9 @@ const food_type = [
     "milk",
     "sauce"
 ]*/
-let foods = require('./bazaara-static-types.json')
-foods = foods.types
+let static_types = require('./bazaara-static-types.json')
+let foods = static_types.types
+let stores = static_types.stores
 console.log(foods)
 
 //Commented out logic to scrape for foods, uncomment to actually scrape and run
@@ -72,12 +73,15 @@ axios.all(promises).then(axios.spread(async (...args) => {
             //results.push(c(element).text())
             counter++
             const label = c(' div > img').text();
+            //{name : label, store : { name : <something> } }
             data.push({
                 name: $(element).find(span.w_N).text,
                 Price: $(element).find(div.b_black_f5_mr1_mr2-xl_lh-copy_f4-l).text,
                 Imageurl: $(element).find().attr('srcset'),
                 Redirurl: $(element).find(a).attr('href'),
-                Weight: $(element).find(span.w_N).text.split(',')[1]
+                weight: $(element).find(span.w_N).text.split(',')[1],
+                store: ,
+                upc_code:
             })
             console.log(`label: ${label}`)
         })
@@ -87,9 +91,27 @@ axios.all(promises).then(axios.spread(async (...args) => {
 }).catch((e) => console.log(e))
 
 function getRandomIntInclusive(min, max) {
-    min = Math.ceil(min);
-    max = Math.floor(max);
+    const min = Math.ceil(min);
+    const max = Math.floor(max);
     return Math.floor(Math.random() * (max - min + 1) + min); //The maximum is inclusive and the minimum is inclusive
+}
+
+function getRandomStoreAndLocation(){
+    const type_select_rand = getRandomIntInclusive(0,3)
+    const coords_select_rand = getRandomIntInclusive(0,3)
+    let store_type = ""
+    let store_loc_info = {}
+    // Select store type at random
+    switch (type_select_rand){
+        case 0: store_type = "Walmart"; break;
+        case 1: store_type = "Target"; break;
+        case 2: store_type = "Acme"; break;
+        case 3: store_type = "Shoprite"; break;
+        default: store_type = "Walmart"; break;
+    }
+    // Select store location at random
+    store_loc_info = stores[type_select_rand].locations[coords_select_rand];
+
 }
 // Promise.all(promises).then(() => {
 //     //   results.forEach(value => console.log(value))
