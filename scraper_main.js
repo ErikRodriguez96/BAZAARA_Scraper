@@ -53,6 +53,8 @@ let foods = static_types.types
 let stores = static_types.stores
 console.log(foods)
 
+//const [store_name, store_info] = getRandomStoreAndLocation();
+
 //Commented out logic to scrape for foods, uncomment to actually scrape and run
 for (let i = 0, k = 0; i < 1; i++) {
     k = getRandomIntInclusive(0,6)
@@ -92,8 +94,8 @@ axios.all(promises).then(axios.spread(async (...args) => {
 }).catch((e) => console.log(e))
 
 function getRandomIntInclusive(min, max) {
-    const min_num = Math.ceil(min);
-    const max_num = Math.floor(max);
+    min = Math.ceil(min);
+    max = Math.floor(max);
     return Math.floor(Math.random() * (max - min + 1) + min); //The maximum is inclusive and the minimum is inclusive
 }
 
