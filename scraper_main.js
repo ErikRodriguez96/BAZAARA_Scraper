@@ -65,6 +65,7 @@ for (let i = 0, k = 0; i < 1; i++) {
 
 axios.all(promises).then(axios.spread(async (...args) => {
     console.log("arg length = ", args.length)
+    const [store_name, store_info] = getRandomStoreAndLocation();
     for (let i = 0; i < args.length; i++) {
         data = []
         const res = args[i]
@@ -80,8 +81,8 @@ axios.all(promises).then(axios.spread(async (...args) => {
                 Imageurl: $(element).find().attr('srcset'),
                 Redirurl: $(element).find(a).attr('href'),
                 weight: $(element).find(span.w_N).text.split(',')[1],
-                store: ,
-                upc_code:
+                store: store_name,
+                upc_code: 101010101010
             })
             console.log(`label: ${label}`)
         })
@@ -91,27 +92,20 @@ axios.all(promises).then(axios.spread(async (...args) => {
 }).catch((e) => console.log(e))
 
 function getRandomIntInclusive(min, max) {
-    const min = Math.ceil(min);
-    const max = Math.floor(max);
+    const min_num = Math.ceil(min);
+    const max_num = Math.floor(max);
     return Math.floor(Math.random() * (max - min + 1) + min); //The maximum is inclusive and the minimum is inclusive
 }
 
 function getRandomStoreAndLocation(){
     const type_select_rand = getRandomIntInclusive(0,3)
     const coords_select_rand = getRandomIntInclusive(0,3)
-    let store_type = ""
-    let store_loc_info = {}
-    // Select store type at random
-    switch (type_select_rand){
-        case 0: store_type = "Walmart"; break;
-        case 1: store_type = "Target"; break;
-        case 2: store_type = "Acme"; break;
-        case 3: store_type = "Shoprite"; break;
-        default: store_type = "Walmart"; break;
-    }
-    // Select store location at random
-    store_loc_info = stores[type_select_rand].locations[coords_select_rand];
 
+    let store_type = stores[type_select_rand].name
+    let store_loc_info = stores[type_select_rand].locations[coords_select_rand];
+    console.log("Store name: ", store_type)
+    console.log("Store info: ", store_loc_info)
+    return [store_type, store_loc_info]
 }
 // Promise.all(promises).then(() => {
 //     //   results.forEach(value => console.log(value))
