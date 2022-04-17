@@ -51,9 +51,12 @@ const food_type = [
 let static_types = require('./bazaara-static-types.json')
 let foods = static_types.types
 let stores = static_types.stores
-console.log(foods)
 
+/* Sanity Checks */
+//console.log(foods)
+console.log(getRandomUPC())
 //const [store_name, store_info] = getRandomStoreAndLocation();
+
 
 //Commented out logic to scrape for foods, uncomment to actually scrape and run
 for (let i = 0, k = 0; i < 1; i++) {
@@ -68,6 +71,7 @@ for (let i = 0, k = 0; i < 1; i++) {
 axios.all(promises).then(axios.spread(async (...args) => {
     console.log("arg length = ", args.length)
     const [store_name, store_info] = getRandomStoreAndLocation();
+    const rand_upc = getRandomUPC()
     for (let i = 0; i < args.length; i++) {
         data = []
         const res = args[i]
@@ -84,7 +88,7 @@ axios.all(promises).then(axios.spread(async (...args) => {
                 Redirurl: $(element).find(a).attr('href'),
                 weight: $(element).find(span.w_N).text.split(',')[1],
                 store: store_name,
-                upc_code: 101010101010
+                upc_code: rand_upc
             })
             console.log(`label: ${label}`)
         })
@@ -108,6 +112,10 @@ function getRandomStoreAndLocation(){
     console.log("Store name: ", store_type)
     console.log("Store info: ", store_loc_info)
     return [store_type, store_loc_info]
+}
+
+function getRandomUPC(){
+    return getRandomIntInclusive(100000000000,999999999999)
 }
 // Promise.all(promises).then(() => {
 //     //   results.forEach(value => console.log(value))
