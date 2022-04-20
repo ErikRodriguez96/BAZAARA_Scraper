@@ -54,8 +54,8 @@ let stores = static_types.stores
 
 /* Sanity Checks */
 //console.log(foods)
-console.log(getRandomUPC())
-//const [store_name, store_info] = getRandomStoreAndLocation();
+// console.log(getRandomUPC())
+const [store_name, store_info] = getRandomStoreAndLocation();
 
 
 //Commented out logic to scrape for foods, uncomment to actually scrape and run
@@ -82,13 +82,14 @@ axios.all(promises).then(axios.spread(async (...args) => {
             const label = c(' div > img').text();
             //{name : label, store : { name : <something> } }
             data.push({
-                name: $(element).find(span.w_N).text,
-                Price: $(element).find(div.b_black_f5_mr1_mr2-xl_lh-copy_f4-l).text,
-                Imageurl: $(element).find().attr('srcset'),
-                Redirurl: $(element).find(a).attr('href'),
-                weight: $(element).find(span.w_N).text.split(',')[1],
-                store: store_name,
-                upc_code: rand_upc
+                "name": $(element).find(span.w_N).text,
+                "productId": 1111,
+                "upc_code": rand_upc,
+                "price": $(element).find(div.b_black_f5_mr1_mr2-xl_lh-copy_f4-l).text,
+                "store": getRandomStoreAndLocation()
+                "image_url": $(element).find().attr('srcset'),
+                //Redirurl: $(element).find(a).attr('href'),
+                "weight": $(element).find(span.w_N).text.split(',')[1]
             })
             console.log(`label: ${label}`)
         })
@@ -106,12 +107,20 @@ function getRandomIntInclusive(min, max) {
 function getRandomStoreAndLocation(){
     const type_select_rand = getRandomIntInclusive(0,3)
     const coords_select_rand = getRandomIntInclusive(0,3)
+    const store_obj = {
+        "name": "",
+        "latitude": 0.0,
+        "longitude": 0.0 }
 
     let store_type = stores[type_select_rand].name
-    let store_loc_info = stores[type_select_rand].locations[coords_select_rand];
-    console.log("Store name: ", store_type)
-    console.log("Store info: ", store_loc_info)
-    return [store_type, store_loc_info]
+    let store_loc_info = stores[type_select_rand].locations[coords_select_rand]
+
+    //populating store object
+    store_obj.name = store_type
+    store_obj.latitude = store_loc_info.lat
+    store_obj.longitude = store_loc_info.lon
+    //console.log("Store object = ", store_obj)
+    return store_obj
 }
 
 function getRandomUPC(){
