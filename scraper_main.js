@@ -79,27 +79,37 @@ axios.all(promises).then(axios.spread(async (...args) => {
     dataset = []
     for (let i = 0; i < args.length; i++) {
         const res = args[i]
-        console.log("res = ", res)
-        const c = await cheerio.load(res.data);
-        console.log("c = ", c)
-        await c('[data-testid="list-view"]').each((index, element) => {
+        //console.log("res = ", res)
+        const $ = await cheerio.load(res.data);
+        //console.log("$ = ", $)
+        await $('[data-testid="list-view"]').each((index, element) => {
+            counter+= 1
             //dataset.push(c(element).text())
-            console.log("element = ", c(element).text())
-            console.log("element = ", c(element).html())
+            //console.log("element = ", $(element).text())
+            //console.log("element = ", $(element).html())
             //console.log("dataset push = ", dataset)
-            let name = c(element).find('span.f6 f5-l normal dark-gray mb0 mt1 lh-title').innerHTML
-            console.log("name = ", name)
-            let price = c(element).find('div.b black f5 mr1 mr2-xl lh-copy f4-l').text()
+            let name_arr = $(element).find('div > div:nth-child(2) > span > span').text().split(',');
+            name = name_arr[0]
+            weight = name_arr[1]
+            //console.log("name_arr", name_arr)
+            console.log("name = ", name, "|| weight = ", weight)
+
+            let price_arr = $(element).find('div:nth-child(2) > div:nth-child(1) > div:nth-child(1)').text().split('$');
+            //console.log("price_arr = ", price_arr)
+            price = price_arr[1]
             console.log("price = ", price)
+
+            let image_url = $(element).find('div > div:nth-child(2) > div > img').attr('src');
+            console.log("image_url = ", image_url)
+
             dataset.push({
-                "name": c(element).find('span.f6_f5-l normal dark-gray mb0 mt1 lh-title').text(),
+                "name": name,
                 "productId": 1111,
                 "upc_code": rand_upc,
-                "price": c(element).find('div.b black f5 mr1 mr2-xl lh-copy f4-l').text(),
+                "price": price,
                 "store": getRandomStoreAndLocation(),
-                "image_url": c(element).find().attr('srcset')
-                //redirurl: c(element).find(a).attr('href'),
-                //"weight": c(element).find('span.f6_f5-l_normal_dark-gray_mb0_mt1_lh-title').text.split(',')[1]
+                "image_url": image_url,
+                "weight": weight
                 })
             //productstring = JSON.stringify(product)
             //console.log("product = ", productstring)
