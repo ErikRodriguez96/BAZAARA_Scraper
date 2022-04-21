@@ -72,11 +72,11 @@ for (let i = 0, k = 0; i < 1; i++) {
         //promises.push(op)
     }
 }
-
+dataset = []
 axios.all(promises).then(axios.spread(async (...args) => {
     console.log("arg length = ", args.length)
-    const rand_upc = getRandomUPC()
-    dataset = []
+
+
     for (let i = 0; i < args.length; i++) {
         const res = args[i]
         //console.log("res = ", res)
@@ -84,33 +84,52 @@ axios.all(promises).then(axios.spread(async (...args) => {
         //console.log("$ = ", $)
         await $('[data-testid="list-view"]').each((index, element) => {
             counter+= 1
+            const rand_upc = getRandomUPC()
             //dataset.push(c(element).text())
             //console.log("element = ", $(element).text())
             //console.log("element = ", $(element).html())
             //console.log("dataset push = ", dataset)
             let name_arr = $(element).find('div > div:nth-child(2) > span > span').text().split(',');
-            name = name_arr[0]
-            weight = name_arr[1]
-            //console.log("name_arr", name_arr)
-            console.log("name = ", name, "|| weight = ", weight)
 
-            let price_arr = $(element).find('div:nth-child(2) > div:nth-child(1) > div:nth-child(1)').text().split('$');
-            //console.log("price_arr = ", price_arr)
-            price = price_arr[1]
-            console.log("price = ", price)
+            let name = name_arr[0]
+            let weight = name_arr[1]
+            //console.log("name_arr", name_arr)
+            console.log("name = ", name, " || weight = ", weight)
 
             let image_url = $(element).find('div > div:nth-child(2) > div > img').attr('src');
             console.log("image_url = ", image_url)
 
-            dataset.push({
-                "name": name,
-                "productId": 1111,
-                "upc_code": rand_upc,
-                "price": price,
-                "store": getRandomStoreAndLocation(),
-                "image_url": image_url,
-                "weight": weight
-                })
+            let price_arr = $(element).find('div:nth-child(2) > div:nth-child(1) > div:nth-child(1)').text().split('$');
+            //console.log("price_arr = ", price_arr)
+            let price = price_arr[1]
+            console.log("price = ", price)
+
+            if (checkIfAttributesAreNull(name, weight, price, image_url) == true){
+
+                const store_rep_arr = JSON.parse(JSON.stringify(static_types.stores));
+                const rep_count = getRandomIntInclusive(1, 3)
+
+                for (let i = 0; i < rep_count; i++){
+                    console.log("store_rep_arr = ", store_rep_arr)
+                    const rep_idx = getRandomIntInclusive(0, store_rep_arr.length - 1)
+                    console.log("rep_idx = ", rep_idx)
+                    let cur_store = store_rep_arr[rep_idx]
+                    console.log("cur_store = ", cur_store.name)
+                    let cur_store_loc = cur_store.locations[getRandomIntInclusive(0,3)]
+                    console.log("cur_store_loc", cur_store_loc)
+                    const store_obj = {"name": cur_store["name"], "latitude": cur_store_loc["lat"] , "longtitude": cur_store_loc["lon"]}
+                    store_rep_arr.splice(rep_idx, 1)
+                    dataset.push({
+                        "name": name,
+                        "productId": 1111,
+                        "upc_code": rand_upc,
+                        "price": price,
+                        "store": store_obj,
+                        "image_url": image_url,
+                        "weight": weight
+                    })
+                }
+            }
             //productstring = JSON.stringify(product)
             //console.log("product = ", productstring)
         })
@@ -128,6 +147,24 @@ function fetchHtml() {
         .then((html) => {
             document.body.innerHTML = html
         });
+}
+
+function checkIfAttributesAreNull(name, weight, price, image_url){
+    if (typeof(name) == "undefined"){
+        return false
+    }
+    else if (typeof(weight) == "undefined"){
+        return false
+    }
+    else if (typeof(price) == "undefined"){
+        return false
+    }
+    else if (typeof(image_url) == "undefined"){
+        return false
+    }
+    else{
+        return true
+    }
 }
 
 function getRandomIntInclusive(min, max) {
