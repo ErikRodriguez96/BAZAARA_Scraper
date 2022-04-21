@@ -73,10 +73,9 @@ for (let i = 0, k = 0; i < 1; i++) {
     }
 }
 dataset = []
+names = {"Jazz Apples": true}
 axios.all(promises).then(axios.spread(async (...args) => {
     console.log("arg length = ", args.length)
-
-
     for (let i = 0; i < args.length; i++) {
         const res = args[i]
         //console.log("res = ", res)
@@ -90,8 +89,9 @@ axios.all(promises).then(axios.spread(async (...args) => {
             //console.log("element = ", $(element).html())
             //console.log("dataset push = ", dataset)
             let name_arr = $(element).find('div > div:nth-child(2) > span > span').text().split(',');
-
             let name = name_arr[0]
+
+            //check if name is unique in dataset
             let weight = name_arr[1]
             //console.log("name_arr", name_arr)
             console.log("name = ", name, " || weight = ", weight)
@@ -104,30 +104,35 @@ axios.all(promises).then(axios.spread(async (...args) => {
             let price = price_arr[1]
             console.log("price = ", price)
 
-            if (checkIfAttributesAreNull(name, weight, price, image_url) == true){
+            if (names.hasOwnProperty(name) === false) {
+                if (checkIfAttributesAreNull(name, weight, price, image_url) == true) {
+                    names[name] = true
+                    const store_rep_arr = JSON.parse(JSON.stringify(static_types.stores));
+                    const rep_count = getRandomIntInclusive(1, 3)
 
-                const store_rep_arr = JSON.parse(JSON.stringify(static_types.stores));
-                const rep_count = getRandomIntInclusive(1, 3)
-
-                for (let i = 0; i < rep_count; i++){
-                    console.log("store_rep_arr = ", store_rep_arr)
-                    const rep_idx = getRandomIntInclusive(0, store_rep_arr.length - 1)
-                    console.log("rep_idx = ", rep_idx)
-                    let cur_store = store_rep_arr[rep_idx]
-                    console.log("cur_store = ", cur_store.name)
-                    let cur_store_loc = cur_store.locations[getRandomIntInclusive(0,3)]
-                    console.log("cur_store_loc", cur_store_loc)
-                    const store_obj = {"name": cur_store["name"], "latitude": cur_store_loc["lat"] , "longtitude": cur_store_loc["lon"]}
-                    store_rep_arr.splice(rep_idx, 1)
-                    dataset.push({
-                        "name": name,
-                        "productId": 1111,
-                        "upc_code": rand_upc,
-                        "price": price,
-                        "store": store_obj,
-                        "image_url": image_url,
-                        "weight": weight
-                    })
+                    for (let i = 0; i < rep_count; i++) {
+                        console.log("store_rep_arr = ", store_rep_arr)
+                        const rep_idx = getRandomIntInclusive(0, store_rep_arr.length - 1)
+                        console.log("rep_idx = ", rep_idx)
+                        let cur_store = store_rep_arr[rep_idx]
+                        console.log("cur_store = ", cur_store.name)
+                        let cur_store_loc = cur_store.locations[getRandomIntInclusive(0, 3)]
+                        console.log("cur_store_loc", cur_store_loc)
+                        const store_obj = {
+                            "name": cur_store["name"],
+                            "latitude": cur_store_loc["lat"],
+                            "longtitude": cur_store_loc["lon"]
+                        }
+                        store_rep_arr.splice(rep_idx, 1)
+                        dataset.push({
+                            "name": String(name),
+                            "upc_code": String(rand_upc),
+                            "price": Number(price),
+                            "store": store_obj,
+                            "image_url": String(image_url),
+                            "weight": String(weight)
+                        })
+                    }
                 }
             }
             //productstring = JSON.stringify(product)
