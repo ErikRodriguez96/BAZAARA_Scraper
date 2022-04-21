@@ -67,44 +67,45 @@ promises.push(op)
 for (let i = 0, k = 0; i < 1; i++) {
     k = getRandomIntInclusive(0,6)
     for (let j = 1; j < pages; j++) {
-        config.headers["user-agent"] = user_agents[k]
-        //let op = axios.get(`https://www.walmart.com/search?q=${foods[i]}&affinityOverride=store_led&page=${j}`, config)
+        //rand_header = config.headers["user-agent"] = user_agents[k]
+        //let op = axios.get(`https://www.walmart.com/search?q=${foods[i]}&affinityOverride=store_led&page=${j}`, rand_header)
         //promises.push(op)
     }
 }
 
-
 axios.all(promises).then(axios.spread(async (...args) => {
     console.log("arg length = ", args.length)
     const rand_upc = getRandomUPC()
+    dataset = []
     for (let i = 0; i < args.length; i++) {
-        data = []
         const res = args[i]
         console.log("res = ", res)
         const c = await cheerio.load(res.data);
         console.log("c = ", c)
-        var product = {}
         await c('[data-testid="list-view"]').each((index, element) => {
-            data.push(c(element).text())
-            console.log("data push = ", data)
-            let name = c(element).
-            //const label = c(' div > img').text();
-            //{name : label, store : { name : <something> } }
-            product = {
-                "name": c(element).find('span.f6_f5-l_normal_dark-gray_mb0_mt1_lh-title').text(),
+            //dataset.push(c(element).text())
+            console.log("element = ", c(element).text())
+            console.log("element = ", c(element).html())
+            //console.log("dataset push = ", dataset)
+            let name = c(element).find('span.f6 f5-l normal dark-gray mb0 mt1 lh-title').innerHTML
+            console.log("name = ", name)
+            let price = c(element).find('div.b black f5 mr1 mr2-xl lh-copy f4-l').text()
+            console.log("price = ", price)
+            dataset.push({
+                "name": c(element).find('span.f6_f5-l normal dark-gray mb0 mt1 lh-title').text(),
                 "productId": 1111,
                 "upc_code": rand_upc,
-                "price": c(element).find('div.b_black_f5_mr1_mr2-xl_lh-copy_f4-l').text(),
+                "price": c(element).find('div.b black f5 mr1 mr2-xl lh-copy f4-l').text(),
                 "store": getRandomStoreAndLocation(),
                 "image_url": c(element).find().attr('srcset')
-                //Redirurl: c(element).find(a).attr('href'),
+                //redirurl: c(element).find(a).attr('href'),
                 //"weight": c(element).find('span.f6_f5-l_normal_dark-gray_mb0_mt1_lh-title').text.split(',')[1]
-                }
-            productstring = JSON.stringify(product)
-            console.log("product = ", productstring)
-            //console.log(`label: ${label}`)
+                })
+            //productstring = JSON.stringify(product)
+            //console.log("product = ", productstring)
         })
     }
+    console.log("dataset final = ", dataset)
 })).then(() => {
     console.log(`TOTAL RESULTS: ${counter}`)
 }).catch((e) => console.log(e))
