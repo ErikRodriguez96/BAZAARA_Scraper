@@ -55,8 +55,13 @@ let stores = static_types.stores
 /* Sanity Checks */
 //console.log(foods)
 // console.log(getRandomUPC())
-const [store_name, store_info] = getRandomStoreAndLocation();
+//const [store_name, store_info] = getRandomStoreAndLocation();
 
+//op = axios.get(`walmart_apples.html`)
+//promises.push(op)
+config.headers["user-agent"] = user_agents[getRandomIntInclusive(0,6)]
+let op = axios.get(`https://www.walmart.com/search?q=apples`, config)
+promises.push(op)
 
 //Commented out logic to scrape for foods, uncomment to actually scrape and run
 for (let i = 0, k = 0; i < 1; i++) {
@@ -64,39 +69,55 @@ for (let i = 0, k = 0; i < 1; i++) {
     for (let j = 1; j < pages; j++) {
         config.headers["user-agent"] = user_agents[k]
         //let op = axios.get(`https://www.walmart.com/search?q=${foods[i]}&affinityOverride=store_led&page=${j}`, config)
-        promises.push(op)
+        //promises.push(op)
     }
 }
 
+
 axios.all(promises).then(axios.spread(async (...args) => {
     console.log("arg length = ", args.length)
-    const [store_name, store_info] = getRandomStoreAndLocation();
     const rand_upc = getRandomUPC()
     for (let i = 0; i < args.length; i++) {
         data = []
         const res = args[i]
+        console.log("res = ", res)
         const c = await cheerio.load(res.data);
-        await c('[class="w_AZ"]').each((index, element) => {
-            //results.push(c(element).text())
-            counter++
-            const label = c(' div > img').text();
+        console.log("c = ", c)
+        var product = {}
+        await c('[data-testid="list-view"]').each((index, element) => {
+            data.push(c(element).text())
+            console.log("data push = ", data)
+            let name = c(element).
+            //const label = c(' div > img').text();
             //{name : label, store : { name : <something> } }
-            data.push({
-                "name": $(element).find(span.w_N).text,
+            product = {
+                "name": c(element).find('span.f6_f5-l_normal_dark-gray_mb0_mt1_lh-title').text(),
                 "productId": 1111,
                 "upc_code": rand_upc,
-                "price": $(element).find(div.b_black_f5_mr1_mr2-xl_lh-copy_f4-l).text,
-                "store": getRandomStoreAndLocation()
-                "image_url": $(element).find().attr('srcset'),
-                //Redirurl: $(element).find(a).attr('href'),
-                "weight": $(element).find(span.w_N).text.split(',')[1]
-            })
-            console.log(`label: ${label}`)
+                "price": c(element).find('div.b_black_f5_mr1_mr2-xl_lh-copy_f4-l').text(),
+                "store": getRandomStoreAndLocation(),
+                "image_url": c(element).find().attr('srcset')
+                //Redirurl: c(element).find(a).attr('href'),
+                //"weight": c(element).find('span.f6_f5-l_normal_dark-gray_mb0_mt1_lh-title').text.split(',')[1]
+                }
+            productstring = JSON.stringify(product)
+            console.log("product = ", productstring)
+            //console.log(`label: ${label}`)
         })
     }
 })).then(() => {
     console.log(`TOTAL RESULTS: ${counter}`)
 }).catch((e) => console.log(e))
+
+function fetchHtml() {
+    fetch('./walmart_apples.html')
+        .then((response) => {
+            return response.text();
+        })
+        .then((html) => {
+            document.body.innerHTML = html
+        });
+}
 
 function getRandomIntInclusive(min, max) {
     min = Math.ceil(min);
